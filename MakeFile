@@ -1,0 +1,116 @@
+# HTTP Server Makefile
+
+# Compiler and flags
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -pedantic
+LDFLAGS =
+DEBUG_FLAGS = -g -DDEBUG
+RELEASE_FLAGS = -O2 -DNDEBUG
+
+# Directories
+SRC_DIR = src
+INCLUDE_DIR = include
+BUILD_DIR = build
+PUBLIC_DIR = public
+LOGS_DIR = logs
+
+# Source files
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
+OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+TARGET = server
+
+# Default target
+.PHONY: all clean debug release install uninstall setup help
+
+all: setup $(TARGET)
+
+# Create necessary directories and files
+setup:
+	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(PUBLIC_DIR)
+	@mkdir -p $(LOGS_DIR)
+	@echo "Directory structure created"
+
+# Build the server executable
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+	@echo "Build complete: $(TARGET)"
+
+# Compile object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+
+# Debug build
+debug: CFLAGS += $(DEBUG_FLAGS)
+debug: clean $(TARGET)
+	@echo "Debug build complete"
+
+# Release build
+release: CFLAGS += $(RELEASE_FLAGS)
+release: clean $(TARGET)
+	@echo "Release build complete"
+
+# Clean build artifacts
+clean:
+	rm -rf $(BUILD_DIR)
+	rm -f $(TARGET)
+	@echo "Clean complete"
+
+# Install to system directory (optional)
+install: $(TARGET)
+	@echo "Installing $(TARGET) to /usr/local/bin/"
+	@sudo cp $(TARGET) /usr/local/bin/
+	@sudo chmod +x /usr/local/bin/$(TARGET)
+	@echo "Installation complete"
+
+# Uninstall from system directory
+uninstall:
+	@echo "Removing $(TARGET) from /usr/local/bin/"
+	@sudo rm -f /usr/local/bin/$(TARGET)
+	@echo "Uninstall complete"
+
+# Run the server (development)
+run: $(TARGET)
+	./$(TARGET) 8080
+
+# Run with custom port
+run-port: $(TARGET)
+	@read -p "Enter port number: " port; \
+	./$(TARGET) $$port
+
+# Check for memory leaks (requires valgrind)
+valgrind: debug
+	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET) 8080
+
+# Static analysis (requires cppcheck)
+check:
+	cppcheck --enable=all --std=c99 $(SRC_DIR)/
+
+# Format code (requires clang-format)
+format:
+	clang-format -i $(SRC_DIR)/*.c $(SRC_DIR)/*.h $(INCLUDE_DIR)/*.h
+
+# Show help
+help:
+	@echo "Available targets:"
+	@echo "  all         - Build the server (default)"
+	@echo "  debug       - Build with debug symbols"
+	@echo "  release     - Build optimized release version"
+	@echo "  clean       - Remove build artifacts"
+	@echo "  setup       - Create necessary directories"
+	@echo "  install     - Install to /usr/local/bin"
+	@echo "  uninstall   - Remove from /usr/local/bin"
+	@echo "  run         - Run server on port 8080"
+	@echo "  run-port    - Run server on custom port"
+	@echo "  valgrind    - Run with memory leak detection"
+	@echo "  check       - Run static analysis"
+	@echo "  format      - Format source code"
+	@echo "  help        - Show this help message"
+
+# Dependency tracking
+-include $(OBJECTS:.o=.d)
+
+$(BUILD_DIR)/%.d: $(SRC_DIR)/%.c
+	@mkdir -p $(BUILD_DIR)
+	@$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -MM -MT $(@:.d=.o) $< > $@

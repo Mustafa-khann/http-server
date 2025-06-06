@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>500 - Internal Server Error</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #d63031 0%, #74b9ff 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+            }
+
+            .container {
+                text-align: center;
+                padding: 2rem;
+                max-width: 600px;
+            }
+
+            .error-code {
+                font-size: 8rem;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                animation: shake 1s infinite;
+            }
+
+            @keyframes shake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                25% {
+                    transform: translateX(-5px);
+                }
+                75% {
+                    transform: translateX(5px);
+                }
+            }
+
+            h1 {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            }
+
+            .message {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+                opacity: 0.9;
+            }
+
+            .error-details {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 1.5rem;
+                border-radius: 10px;
+                margin: 2rem 0;
+                backdrop-filter: blur(10px);
+            }
+
+            .error-details h3 {
+                margin-bottom: 1rem;
+                font-size: 1.3rem;
+                color: #fdcb6e;
+            }
+
+            .error-details p {
+                text-align: left;
+                margin-bottom: 1rem;
+            }
+
+            .suggestions {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 1.5rem;
+                border-radius: 10px;
+                margin: 2rem 0;
+                backdrop-filter: blur(10px);
+            }
+
+            .suggestions h3 {
+                margin-bottom: 1rem;
+                font-size: 1.3rem;
+            }
+
+            .suggestions ul {
+                list-style: none;
+                text-align: left;
+            }
+
+            .suggestions li {
+                padding: 0.5rem 0;
+                padding-left: 1.5rem;
+                position: relative;
+            }
+
+            .suggestions li:before {
+                content: "⚡";
+                position: absolute;
+                left: 0;
+                font-weight: bold;
+            }
+
+            .back-link {
+                display: inline-block;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                text-decoration: none;
+                padding: 1rem 2rem;
+                border-radius: 5px;
+                margin-top: 1rem;
+                transition: background 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .back-link:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+
+            .server-info {
+                margin-top: 2rem;
+                opacity: 0.7;
+                font-size: 0.9rem;
+            }
+
+            .warning-icon {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="warning-icon">⚠️</div>
+            <div class="error-code">500</div>
+            <h1>Internal Server Error</h1>
+            <p class="message">
+                Something went wrong on our end. The server encountered an
+                unexpected condition.
+            </p>
+
+            <div class="error-details">
+                <h3>What happened?</h3>
+                <p>
+                    The server encountered an internal error or misconfiguration
+                    and was unable to complete your request.
+                </p>
+                <p>
+                    This is usually a temporary problem, so please try again in
+                    a few moments.
+                </p>
+            </div>
+
+            <div class="suggestions">
+                <h3>What you can try:</h3>
+                <ul>
+                    <li>Refresh the page after a few moments</li>
+                    <li>Check the server logs for error details</li>
+                    <li>Contact the server administrator</li>
+                    <li>Try accessing a different page</li>
+                </ul>
+            </div>
+
+            <a href="/" class="back-link">← Back to Homepage</a>
+
+            <div class="server-info">
+                <p>HTTP Server Phase 1 - Error 500</p>
+                <p>Server: SimpleHTTP/1.0</p>
+            </div>
+        </div>
+    </body>
+</html>
