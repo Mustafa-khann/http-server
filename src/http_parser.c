@@ -46,11 +46,11 @@ int parse_http_request(const char *raw_request, http_request_t *request) {
     int header_pos = 0;
     while ((header_line = strtok(NULL, "\r\n")) != NULL && strlen(header_line) > 0) {
         /* Store headers for potential future use */
-        int remaining_space = MAX_HEADER_SIZE - header_pos - 1;
+        int remaining_space = MAX_HEADERS_SIZE - header_pos - 1;
         if (remaining_space > 0) {
             strncat(request->headers + header_pos, header_line, remaining_space);
             header_pos += strlen(header_line);
-            if (header_pos < MAX_HEADER_SIZE - 2) {
+            if (header_pos < MAX_HEADERS_SIZE - 2) {
                 strcat(request->headers + header_pos, "\n");
                 header_pos++;
             }
