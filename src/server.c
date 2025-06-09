@@ -1,6 +1,5 @@
 #include "server.h"
 #include <asm-generic/socket.h>
-#include <climits>
 #include <netinet/in.h>
 #include <signal.h>
 #include <stdio.h>
@@ -40,8 +39,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    printf(COLOR_GREEN "HTTP Server started on port %d", COLOR_RESET, port);
-    printf(Press Ctrl+C to stop the server\n);
+    printf(COLOR_GREEN "HTTP Server started on port %d" COLOR_RESET "\n", port);
+    printf("Press Ctrl+C to stop the server\n");
 
     start_server(&g_server);
 
@@ -54,7 +53,7 @@ int create_server(int port)
 
     // Create socket
     g_server.server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if(g_server.server_fd = -1)
+    if(g_server.server_fd == -1)
     {
         perror("Socket creation failed");
         return -1;
@@ -83,6 +82,12 @@ int create_server(int port)
             return -1;
         }
 
+    if (listen(g_server.server_fd, SOMAXCONN) < 0)
+        {
+            perror("Listen failed");
+            return -1;
+        }
+
     log_message(LOG_INFO, "Server socket created and listening on port %d", port);
     return 0;
 }
@@ -91,31 +96,31 @@ void start_server(server_t *server)
 {
     int client_fd;
     struct sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
+    socklen_t client_len;
 
     while(server->running)
     {
         // Accept incoming connection
+        client_len = sizeof(client_addr);
         client_fd = accept(server->server_fd, (struct sockaddr*)&client_addr, &client_len);
-
         if(client_fd < 0)
             {
                 perror("Accept failed");
                 log_message(LOG_ERROR, "Failed to accept client connection");
+                break;
             }
-        continue;
+
+        // Log client connection
+        char client_ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
+        log_message(LOG_INFO, "New connection from %s:%d", client_ip, ntohs(client_addr.sin_port));
+
+        // handle client request
+        handle_client(client_fd);
+
+        // close client socket
+        close(client_fd);
     }
-
-    // Log client connection
-    char client_ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
-    log_message(LOG_INFO, "New connection from %s:%d", client_ip, ntohs(client_addr.sin_port));
-
-    // handle client request
-    handle_client(client_fd);
-
-    // close client socket
-    close(client_fd);
 }
 
 void handle_client(int client_fd)
@@ -188,7 +193,7 @@ void cleanup_server(server_t *server)
 
 void signal_handler(int sig)
 {
-    printf(COLOR_YELLOW "\nRecieved signal %d, shutting down server ...\n", COLOR_RESET, sig);
+    printf(COLOR_YELLOW "\nRecieved signal %d, shutting down server ...\n" COLOR_RESET, sig);
     g_server.running = FALSE;
     cleanup_server(&g_server);
     exit(EXIT_SUCCESS);
